@@ -1,0 +1,19 @@
+workflows:
+  android-native-debug:
+    name: MarineGPS Android Debug
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+    environment:
+      java: 17
+    scripts:
+      - name: Install Android SDK packages
+        script: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+      - name: Build with Gradle 8.9
+        script: |
+          curl --fail --location --retry 3 https://services.gradle.org/distributions/gradle-8.9-bin.zip -o /tmp/marine-gradle.zip
+          unzip -q /tmp/marine-gradle.zip -d /tmp/marine-gradle
+          /tmp/marine-gradle/gradle-8.9/bin/gradle :app:assembleDebug --stacktrace
+    artifacts:
+      - app/build/outputs/apk/debug/*.apk
